@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // UBDL CLI Tool
 
 const yargs = require('yargs')

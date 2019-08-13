@@ -1,6 +1,7 @@
 {
   "name": "ubdi-cli",
   "version": "1.0.0",
+  "bin": "index.js",
   "main": "index.js",
   "author": "Vedad Sose <vedadsose@gmail.com>",
   "license": "MIT",
