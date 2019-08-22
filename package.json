@@ -1,10 +1,11 @@
 {
-  "name": "ubdi-cli",
+  "name": "@ubdi/ubdi-cli",
   "version": "1.0.0",
   "bin": "index.js",
   "main": "index.js",
   "author": "Vedad Sose <vedadsose@gmail.com>",
   "license": "MIT",
+  "repository": "git://github.com/ubdi/ubdi-cli.git",
   "dependencies": {
     "axios": "^0.19.0",
     "date-fns": "^1.30.1",
