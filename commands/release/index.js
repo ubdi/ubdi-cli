@@ -11,7 +11,7 @@ const {
   checkoutMaster,
   tagAndPush
 } = require('./utils')
-const { execBash, tag } = require('../../utils')
+const { execBash, tag, loadConfig } = require('../../utils')
 
 const output = console.log // eslint-disable-line no-console
 
@@ -24,9 +24,11 @@ const outputDiff = diff => {
 
 // Main fns
 const releaseApp = async app => {
+  const paths = await loadConfig(apps.map(({ name }) => name))
+
   output('\n')
   const oraPull = ora('Pulling repo and fetching tags...').start()
-  const repo = simpleGit(app.path)
+  const repo = simpleGit(paths[app.name])
 
   await checkoutMaster(repo)
 
@@ -122,9 +124,9 @@ const releaseApp = async app => {
 
     for (const cmd of releaseCommands) {
       const oraCommand = ora(
-        chalk.green(`\nRunning ${cmd} in ${app.path} \n`)
+        chalk.green(`\nRunning ${cmd} in ${paths[app.name]} \n`)
       ).start()
-      const result = await execBash(`cd ${app.path} && ${cmd}`)
+      const result = await execBash(`cd ${paths[app.name]} && ${cmd}`)
       output(result)
       oraCommand.succeed('✅')
     }
