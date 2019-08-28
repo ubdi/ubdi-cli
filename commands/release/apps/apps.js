@@ -17,6 +17,11 @@ module.exports = [
       native: ['yarn tag:beta'],
       codepush: ['yarn tag:beta:codepush']
     },
-    dependencies: ['ubdi-api']
+    dependencies: ['ubdi-api', 'insights']
+  },
+  {
+    name: 'insights',
+    displayName: 'Insights Crunch',
+    dependencies: ['mobile-ubdi-app']
   }
 ]
