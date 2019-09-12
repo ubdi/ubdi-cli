@@ -1,9 +1,11 @@
-const getTags = repo =>
+const getTags = (repo, options) =>
   new Promise((resolve, reject) => {
-    repo.pull('origin', 'master', { '--tags': true }).tags((err, tags) => {
-      if (err) return reject(err)
-      return resolve(tags)
-    })
+    repo
+      .pull('origin', 'master', { '--tags': true })
+      .tags(options, (err, tags) => {
+        if (err) return reject(err)
+        return resolve(tags)
+      })
   })
 
 const getDiffSinceLastTag = (repo, lastTag, file) =>

@@ -12,12 +12,8 @@ module.exports = [
   {
     name: 'mobile-ubdi-app',
     displayName: 'Mobile UBDI App',
-    skipTag: true,
-    releaseCommands: {
-      native: ['yarn tag:beta'],
-      codepush: ['yarn tag:beta:codepush']
-    },
-    dependencies: ['ubdi-api', 'insights']
+    dependencies: ['ubdi-api', 'insights'],
+    reactNative: true
   },
   {
     name: 'insights',
