@@ -15,7 +15,7 @@
     "ramda": "^0.26.1",
     "simple-git": "^1.124.0",
     "yargs": "^13.3.0",
-    "react-native-version-up": "https://github.com/ubdi/react-native-version-up"
+    "react-native-version-up": "git+https://git@github.com/ubdi/react-native-version-up.git"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",

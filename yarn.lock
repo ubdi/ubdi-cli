@@ -1085,9 +1085,9 @@ ramda@^0.26.1:
   resolved "https://registry.yarnpkg.com/ramda/-/ramda-0.26.1.tgz#8d41351eb8111c55353617fc3bbffad8e4d35d06"
   integrity sha512-hLWjpy7EnsDBb0p+Z3B7rPi3GDeRG5ZtiI33kJhTt+ORCd38AbAIjB/9zRIUoeTbE/AVX5ZkU7m6bznsvrf8eQ==
 
-"react-native-version-up@https://github.com/ubdi/react-native-version-up":
+"react-native-version-up@git+https://git@github.com/ubdi/react-native-version-up.git":
   version "1.0.9"
-  resolved "https://github.com/ubdi/react-native-version-up#7c7d2e980cae299c4ca262ab8799f82f13ec3296"
+  resolved "git+https://git@github.com/ubdi/react-native-version-up.git#fb7877d882effa29aad39944f8a53b41834bfede"
   dependencies:
     chalk "2.0.1"
     child_process "1.0.2"

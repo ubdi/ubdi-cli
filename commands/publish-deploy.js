@@ -16,6 +16,12 @@ module.exports = {
       .option('slackWebhook', {
         describe: 'slack webook (what goes after hooks.slack.com/services/)'
       })
+      .option('jobUrl', {
+        describe: 'URL to the job on CI'
+      })
+      .option('failed', {
+        describe: 'marks the job as failed'
+      })
       .demandOption(
         requiredArguments,
         `Required arguments: ${requiredArguments.join(', ')}`
@@ -30,8 +36,8 @@ module.exports = {
     const body = {
       attachments: [
         {
-          text: 'Successful deployment',
-          color: '#36a64f',
+          text: !args.failed ? 'Successful deployment' : 'Deployment failed',
+          color: !args.failed ? '#36a64f' : '#ee5253',
           author_name: deployer.name,
           author_icon: deployer.avatar_url,
           fields: [
@@ -43,6 +49,11 @@ module.exports = {
             {
               title: 'Environment',
               value: args.env,
+              short: false
+            },
+            args.jobUrl && {
+              title: 'Job',
+              value: args.jobUrl,
               short: false
             },
             args.image && {
