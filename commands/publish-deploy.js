@@ -21,7 +21,7 @@ module.exports = {
         `Required arguments: ${requiredArguments.join(', ')}`
       ),
   exec: async args => {
-    const endPoint = `https://hooks.slack.com/services/${args.slackToken}`
+    const endPoint = `https://hooks.slack.com/services/${args.slackWebhook}`
 
     const { data: deployer } = await axios.get(
       `https://api.github.com/users/${args.deployer}`
