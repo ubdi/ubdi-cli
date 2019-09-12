@@ -1,5 +1,7 @@
 const axios = require('axios')
 
+const requiredArguments = ['app', 'env', 'deployer', 'slackWebhook']
+
 module.exports = {
   command: 'publish-deploy',
   description: 'Publishes a deploy to Slack',
@@ -11,13 +13,15 @@ module.exports = {
       .option('env', { describe: 'deployment environment' })
       .option('image', { describe: 'docker image deployed' })
       .option('deployer', { describe: 'github username of deployer' })
+      .option('slackWebhook', {
+        describe: 'slack webook (what goes after hooks.slack.com/services/)'
+      })
       .demandOption(
-        ['app', 'env'],
-        'Please provide both app and env arguments'
+        requiredArguments,
+        `Required arguments: ${requiredArguments.join(', ')}`
       ),
   exec: async args => {
-    const endPoint =
-      'https://hooks.slack.com/services/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'
+    const endPoint = `https://hooks.slack.com/services/${args.slackToken}`
 
     const { data: deployer } = await axios.get(
       `https://api.github.com/users/${args.deployer}`
