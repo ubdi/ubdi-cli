@@ -124,7 +124,7 @@ const runReactNativeBump = async input => {
 
   return {
     ...input,
-    newTag: `${info.version}-codepush.${codePushTags.length + 1}`
+    newTag: `v${info.version}-codepush.${codePushTags.length + 1}`
   }
 }
 
