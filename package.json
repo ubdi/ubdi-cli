@@ -1,6 +1,6 @@
 {
   "name": "@ubdi/ubdi-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "bin": "index.js",
   "main": "index.js",
   "author": "UBDI",
