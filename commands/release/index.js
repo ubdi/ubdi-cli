@@ -91,9 +91,17 @@ const runReactNativeBump = async input => {
   const { info } = reactNativeVersionUp.getCurrentInfo({ pathToRoot })
   const lastNativeTag = `v${info.version}`
 
-  const podfileDiff = await getDiffSinceLastTag(repo, lastNativeTag, 'ios')
+  const podfileDiff = await getDiffSinceLastTag(
+    repo,
+    lastNativeTag,
+    'ios/Podfile'
+  )
 
-  const gradleDiff = await getDiffSinceLastTag(repo, lastNativeTag, 'android')
+  const gradleDiff = await getDiffSinceLastTag(
+    repo,
+    lastNativeTag,
+    'android/app/build.gradle'
+  )
 
   const nativeDiff = podfileDiff.total > 0 || gradleDiff.total > 0
 
