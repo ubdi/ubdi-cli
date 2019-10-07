@@ -7,12 +7,7 @@ const { pipe, then } = require('ramda')
 const reactNativeVersionUp = require('react-native-version-up')
 
 const apps = require('./apps/apps')
-const {
-  getTags,
-  getDiffSinceLastTag,
-  checkoutMaster,
-  tagAndPush
-} = require('./utils')
+const { getTags, getDiffSinceLastTag, tagAndPush } = require('./utils')
 const { tag, loadConfig } = require('../../utils')
 
 const output = console.log // eslint-disable-line no-console
@@ -26,6 +21,7 @@ const releaseApp = app =>
     then(generateNewTag),
     then(getDiff),
     then(confirmTag),
+    then(decideLane),
     then(runReactNativeBump),
     then(pushNewTag),
     then(handleDepenedencies),
@@ -55,8 +51,6 @@ const pullRepo = async input => {
   const oraPull = ora('Pulling repo and fetching tags...').start()
   const repo = simpleGit(paths[app.name])
 
-  await checkoutMaster(repo)
-
   return {
     ...input,
     app,
@@ -81,31 +75,49 @@ const getLatestTag = async input => {
   }
 }
 
+const decideLane = async input => {
+  if (!input) return false
+  const { app } = input
+
+  if (!app.reactNative) return input
+
+  const { lane } = await prompts({
+    type: 'select',
+    name: 'lane',
+    message: 'Which lane do you want to use?',
+    choices: [
+      { title: 'Alpha 😱', value: 'alpha' },
+      { title: 'Beta 👀', value: 'beta' },
+      { title: 'Release 🚀', value: 'release' }
+    ]
+  })
+
+  const { buildNative } = await prompts({
+    type: 'toggle',
+    name: 'buildNative',
+    message: `Was there a change in the native code?`,
+    initial: false,
+    active: 'yes',
+    inactive: 'no'
+  })
+
+  return {
+    ...input,
+    lane,
+    buildNative
+  }
+}
+
 const runReactNativeBump = async input => {
   if (!input) return false
-  const { paths, app, repo, tags } = input
+  const { paths, app, tags, lane, buildNative } = input
 
   if (!app.reactNative) return input
 
   const pathToRoot = paths[app.name]
   const { info } = reactNativeVersionUp.getCurrentInfo({ pathToRoot })
-  const lastNativeTag = `v${info.version}`
 
-  const podfileDiff = await getDiffSinceLastTag(
-    repo,
-    lastNativeTag,
-    'ios/Podfile'
-  )
-
-  const gradleDiff = await getDiffSinceLastTag(
-    repo,
-    lastNativeTag,
-    'android/app/build.gradle'
-  )
-
-  const nativeDiff = podfileDiff.total > 0 || gradleDiff.total > 0
-
-  if (nativeDiff) {
+  if (buildNative) {
     const { version } = await reactNativeVersionUp({
       pathToRoot,
       patch: 'patch'
@@ -113,18 +125,18 @@ const runReactNativeBump = async input => {
 
     return {
       ...input,
-      newTag: `v${version}`
+      newTag: `v${version}-${lane}`
     }
-  }
+  } else {
+    // There was no native change, just codepush
+    const codePushTags = tags.all.filter(tag =>
+      tag.match(new RegExp('v' + info.version + '-' + lane + '-codepush'))
+    )
 
-  // There was no native change, just codepush
-  const codePushTags = tags.all.filter(tag =>
-    tag.match(new RegExp('v' + info.version + '-codepush'))
-  )
-
-  return {
-    ...input,
-    newTag: `v${info.version}-codepush.${codePushTags.length + 1}`
+    return {
+      ...input,
+      newTag: `v${info.version}-${lane}-codepush.${codePushTags.length + 1}`
+    }
   }
 }
 
