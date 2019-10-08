@@ -2,6 +2,18 @@ const axios = require('axios')
 
 const requiredArguments = ['app', 'env', 'deployer', 'slackWebhook']
 
+const getDeployer = async username => {
+  try {
+    const { data: deployer } = await axios.get(
+      `https://api.github.com/users/${username}`
+    )
+
+    return deployer
+  } catch (error) {
+    return null
+  }
+}
+
 module.exports = {
   command: 'publish-deploy',
   description: 'Publishes a deploy to Slack',
@@ -29,17 +41,22 @@ module.exports = {
   exec: async args => {
     const endPoint = `https://hooks.slack.com/services/${args.slackWebhook}`
 
-    const { data: deployer } = await axios.get(
-      `https://api.github.com/users/${args.deployer}`
-    )
+    const deployer = getDeployer(args.deployer)
+    const deployerBody = deployer
+      ? {
+          author_name: deployer.name,
+          author_icon: deployer.avatar_url
+        }
+      : {
+          author_name: 'Unknown Author'
+        }
 
     const body = {
       attachments: [
         {
+          ...deployerBody,
           text: !args.failed ? 'Successful deployment' : 'Deployment failed',
           color: !args.failed ? '#36a64f' : '#ee5253',
-          author_name: deployer.name,
-          author_icon: deployer.avatar_url,
           fields: [
             {
               title: 'Application',
