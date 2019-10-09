@@ -1,13 +1,13 @@
 {
   "name": "@ubdi/ubdi-cli",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "bin": "index.js",
   "main": "index.js",
   "author": "UBDI",
   "license": "MIT",
   "repository": "git://github.com/ubdi/ubdi-cli.git",
   "scripts": {
-    "postversion": "git push origin $npm_package_version && npm publish && echo \"Successfully released version $npm_package_version!\""
+    "postversion": "git push origin v$npm_package_version && npm publish && echo \"Successfully released version $npm_package_version!\""
   },
   "dependencies": {
     "axios": "^0.19.0",
