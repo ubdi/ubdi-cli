@@ -17,11 +17,11 @@ const releaseApp = app =>
   pipe(
     getPaths,
     then(pullRepo),
+    then(decideLane),
     then(getLatestTag),
     then(generateNewTag),
     then(getDiff),
     then(confirmTag),
-    then(decideLane),
     then(runReactNativeBump),
     then(pushNewTag),
     then(handleDepenedencies),
@@ -48,30 +48,38 @@ const getPaths = async input => {
 const pullRepo = async input => {
   const { app, paths } = input
   output('\n')
-  const oraPull = ora('Pulling repo and fetching tags...').start()
   const repo = simpleGit(paths[app.name])
 
   return {
     ...input,
     app,
-    oraPull,
     repo
   }
 }
 
 const getLatestTag = async input => {
   if (!input) return false
-  const { app, repo } = input
+  const { app, repo, lane } = input
+
+  const oraPull = ora('Pulling repo and fetching tags...').start()
 
   const tags = await getTags(
     repo,
     app.reactNative ? { '--sort': '-v:refname' } : {}
   )
 
+  const latestTag =
+    lane && lane === 'release'
+      ? tags.latest
+      : tags.all.filter(tag => tag.match(new RegExp(lane)))[0]
+
+  console.warn({ latestTag })
+
   return {
     ...input,
+    oraPull,
     tags,
-    latestTag: tags.latest
+    latestTag
   }
 }
 
@@ -86,9 +94,23 @@ const decideLane = async input => {
     name: 'lane',
     message: 'Which lane do you want to use?',
     choices: [
-      { title: 'Alpha 😱', value: 'alpha' },
-      { title: 'Beta 👀', value: 'beta' },
-      { title: 'Release 🚀', value: 'release' }
+      {
+        title: 'Alpha 😱',
+        value: 'alpha',
+        description: 'Deploys build to Internal testers via MS AppCenter'
+      },
+      {
+        title: 'Beta 👀',
+        value: 'beta',
+        description:
+          'Deploys beta build to Public testers via TestFlight and Play Store'
+      },
+      {
+        title: 'Release 🚀',
+        value: 'release',
+        description:
+          'Releases Android to Play Store and prepares iOS release to App Store'
+      }
     ]
   })
 
@@ -118,14 +140,21 @@ const runReactNativeBump = async input => {
   const { info } = reactNativeVersionUp.getCurrentInfo({ pathToRoot })
 
   if (buildNative) {
-    const { version } = await reactNativeVersionUp({
-      pathToRoot,
-      patch: 'patch'
-    })
+    if (lane === 'release') {
+      const { version } = await reactNativeVersionUp({
+        pathToRoot,
+        patch: 'patch'
+      })
+
+      return {
+        ...input,
+        newTag: `v${version}-${lane}`
+      }
+    }
 
     return {
       ...input,
-      newTag: `v${version}-${lane}`
+      newTag: input.newTag + '-alpha'
     }
   } else {
     // There was no native change, just codepush
