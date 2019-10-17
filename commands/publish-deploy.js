@@ -41,7 +41,7 @@ module.exports = {
   exec: async args => {
     const endPoint = `https://hooks.slack.com/services/${args.slackWebhook}`
 
-    const deployer = getDeployer(args.deployer)
+    const deployer = await getDeployer(args.deployer)
     const deployerBody = deployer
       ? {
           author_name: deployer.name,
