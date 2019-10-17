@@ -1,6 +1,6 @@
 {
   "name": "@ubdi/ubdi-cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "bin": "index.js",
   "main": "index.js",
   "author": "UBDI",
@@ -13,9 +13,9 @@
     "ora": "^3.4.0",
     "prompts": "^2.2.1",
     "ramda": "^0.26.1",
+    "react-native-version-up": "git+https://git@github.com/ubdi/react-native-version-up.git",
     "simple-git": "^1.124.0",
-    "yargs": "^13.3.0",
-    "react-native-version-up": "git+https://git@github.com/ubdi/react-native-version-up.git"
+    "yargs": "^13.3.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
