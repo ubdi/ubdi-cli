@@ -161,14 +161,13 @@ const runReactNativeBump = async input => {
   const { paths, app, lane } = input
 
   if (!app.reactNative) return input
-  if (lane !== 'release') return input // runs only for native release
+  if (!['release', 'beta'].includes(lane)) return input // runs only for native release
 
   const pathToRoot = paths[app.name]
 
   const { version } = await reactNativeVersionUp({
     pathToRoot,
-    patch: 'patch',
-    skipBuildIncrease: true
+    patch: 'patch'
   })
 
   // Exception from tag naming, uses semver
