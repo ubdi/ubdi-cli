@@ -73,8 +73,6 @@ const getLatestTag = async input => {
       ? tags.latest
       : tags.all.filter(tag => tag.match(new RegExp(lane)))[0]
 
-  console.warn({ latestTag })
-
   return {
     ...input,
     oraPull,
@@ -125,55 +123,37 @@ const decideLane = async input => {
 
   return {
     ...input,
-    lane,
-    buildNative
+    lane: buildNative ? lane : `${lane}-codepush`
   }
 }
 
 const runReactNativeBump = async input => {
   if (!input) return false
-  const { paths, app, tags, lane, buildNative } = input
+  const { paths, app, lane } = input
 
   if (!app.reactNative) return input
+  if (lane !== 'release') return input // runs only for native release
 
   const pathToRoot = paths[app.name]
-  const { info } = reactNativeVersionUp.getCurrentInfo({ pathToRoot })
 
-  if (buildNative) {
-    if (lane === 'release') {
-      const { version } = await reactNativeVersionUp({
-        pathToRoot,
-        patch: 'patch'
-      })
+  const { version } = await reactNativeVersionUp({
+    pathToRoot,
+    patch: 'patch',
+    skipBuildIncrease: true
+  })
 
-      return {
-        ...input,
-        newTag: `v${version}-${lane}`
-      }
-    }
-
-    return {
-      ...input,
-      newTag: input.newTag + '-alpha'
-    }
-  } else {
-    // There was no native change, just codepush
-    const codePushTags = tags.all.filter(tag =>
-      tag.match(new RegExp('v' + info.version + '-' + lane + '-codepush'))
-    )
-
-    return {
-      ...input,
-      newTag: `v${info.version}-${lane}-codepush.${codePushTags.length + 1}`
-    }
+  // Exception from tag naming, uses semver
+  return {
+    ...input,
+    newTag: `v${version}-${lane}`
   }
 }
 
 const generateNewTag = input => {
   if (!input) return false
-  const { tags } = input
+  const { tags, lane } = input
 
-  const newTag = tag.generateTagName(tags.all)
+  const newTag = tag.generateTagName(tags.all, lane)
 
   return {
     ...input,
