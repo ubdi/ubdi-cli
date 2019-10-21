@@ -7,7 +7,12 @@ const { pipe, then } = require('ramda')
 const reactNativeVersionUp = require('react-native-version-up')
 
 const apps = require('./apps/apps')
-const { getTags, getDiffSinceLastTag, tagAndPush } = require('./utils')
+const {
+  getTags,
+  getBranchName,
+  getDiffSinceLastTag,
+  tagAndPush
+} = require('./utils')
 const { tag, loadConfig } = require('../../utils')
 
 const output = console.log // eslint-disable-line no-console
@@ -83,7 +88,7 @@ const getLatestTag = async input => {
 
 const decideLane = async input => {
   if (!input) return false
-  const { app } = input
+  const { app, repo } = input
 
   if (!app.reactNative) return input
 
@@ -92,6 +97,12 @@ const decideLane = async input => {
     name: 'lane',
     message: 'Which lane do you want to use?',
     choices: [
+      {
+        title: 'Feature 🎁',
+        value: 'feature',
+        description:
+          'Deploys a named Feature build to Internal testers via MS AppCenter'
+      },
       {
         title: 'Alpha 😱',
         value: 'alpha',
@@ -111,6 +122,24 @@ const decideLane = async input => {
       }
     ]
   })
+
+  if (lane === 'feature') {
+    const branchName = (await getBranchName(repo)).match(/feature-(\w+)/)
+    const [, initial] = branchName || []
+
+    const { featureName } = await prompts({
+      type: 'text',
+      name: 'featureName',
+      message: 'What is your feature name?',
+      validate: value => value && value.length <= 10 && value.match(/[a-z]+/),
+      initial
+    })
+
+    return {
+      ...input,
+      lane: `feature-${featureName}`
+    }
+  }
 
   const { buildNative } = await prompts({
     type: 'toggle',

@@ -11,6 +11,14 @@ const getTags = (repo, options) =>
     })
   })
 
+const getBranchName = repo =>
+  new Promise((resolve, reject) => {
+    repo.status((err, status) => {
+      if (err) return reject(err)
+      resolve(status.current)
+    })
+  })
+
 const getDiffSinceLastTag = (repo, lastTag, file) =>
   new Promise((resolve, reject) =>
     repo.log({ from: lastTag, to: 'HEAD', file }, (err, log) => {
@@ -42,5 +50,6 @@ module.exports = {
   getTags,
   getDiffSinceLastTag,
   checkoutMaster,
-  tagAndPush
+  tagAndPush,
+  getBranchName
 }
