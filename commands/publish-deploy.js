@@ -42,47 +42,51 @@ module.exports = {
     const endPoint = `https://hooks.slack.com/services/${args.slackWebhook}`
 
     const deployer = await getDeployer(args.deployer)
-    const deployerBody = deployer
-      ? {
-          author_name: deployer.name,
-          author_icon: deployer.avatar_url
-        }
-      : {
-          author_name: 'Unknown Author'
-        }
+
+    const appInfoMessage = `of *${args.app}* to *${args.env}* ${
+      args.env.toLowerCase() === 'production' ? ':dart:' : ':dancer:'
+    }`
 
     const body = {
-      attachments: [
+      text: 'test',
+      blocks: [
         {
-          ...deployerBody,
-          text: !args.failed ? 'Successful deployment' : 'Deployment failed',
-          color: !args.failed ? '#36a64f' : '#ee5253',
-          fields: [
-            {
-              title: 'Application',
-              value: args.app,
-              short: false
-            },
-            {
-              title: 'Environment',
-              value: args.env,
-              short: false
-            },
-            args.jobUrl && {
-              title: 'Job',
-              value: args.jobUrl,
-              short: false
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: !args.failed
+              ? `:white_check_mark: Successful deployment ${appInfoMessage}`
+              : `:fire: Deployment ${appInfoMessage} *failed*`
+          }
+        },
+        (args.job || args.image) && {
+          type: 'context',
+          elements: [
+            args.job && {
+              type: 'mrkdwn',
+              text: `Job: *${args.job}*`
             },
             args.image && {
-              title: 'Image',
-              value: args.image,
-              short: false
+              type: 'mrkdwn',
+              text: `Image: *${args.image}*`
             }
-          ].filter(Boolean),
-          footer: 'UBDI-CLI',
-          ts: Math.round(new Date().getTime() / 1000)
+          ].filter(i => !!i)
+        },
+        {
+          type: 'context',
+          elements: [
+            {
+              type: 'mrkdwn',
+              text: `Deployed by *${deployer.name}*`
+            },
+            {
+              type: 'image',
+              image_url: deployer.avatar_url,
+              alt_text: 'images'
+            }
+          ]
         }
-      ]
+      ].filter(i => !!i)
     }
 
     await axios.post(endPoint, body)
