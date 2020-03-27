@@ -72,7 +72,7 @@ module.exports = {
             }
           ].filter(i => !!i)
         },
-        {
+        deployer && {
           type: 'context',
           elements: [
             {
