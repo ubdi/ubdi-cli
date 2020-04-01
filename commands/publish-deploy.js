@@ -14,6 +14,14 @@ const getDeployer = async username => {
   }
 }
 
+const getEcrFindingsCount = cliResponse => {
+  try {
+    return JSON.parse(cliResponse).imageScanFindings.findings.length
+  } catch(err){
+    return null
+  }
+}
+
 module.exports = {
   command: 'publish-deploy',
   description: 'Publishes a deploy to Slack',
@@ -33,6 +41,9 @@ module.exports = {
       })
       .option('failed', {
         describe: 'marks the job as failed'
+      })
+      .option('ecrFindings', {
+        describe: 'Findings for ECR security scans'
       })
       .demandOption(
         requiredArguments,
@@ -85,6 +96,13 @@ module.exports = {
               alt_text: 'images'
             }
           ]
+        },
+        (args.ecrFindings && getEcrFindingsCount(args.ecrFindings) > 0) && {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `:shinto_shrine: There are security scan findings! Check them out on ECR!`
+          }
         }
       ].filter(i => !!i)
     }
