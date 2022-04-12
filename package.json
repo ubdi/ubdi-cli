@@ -14,7 +14,7 @@
     "prompts": "^2.2.1",
     "ramda": "^0.26.1",
     "react-native-version-up": "git+https://git@github.com/ubdi/react-native-version-up.git",
-    "simple-git": "^1.124.0",
+    "simple-git": "^3.5.0",
     "yargs": "^14.0.0"
   },
   "publishConfig": {
